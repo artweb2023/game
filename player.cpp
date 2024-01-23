@@ -3,14 +3,14 @@
 
 constexpr float PLAYER_SPEED = 80.f;
 static const sf::Vector2f HERO_INITIAL_POSITION(400, 300);
-static const float AIM_DISTANCE = 80.0f;
-const float animationTime = 0.1f;
-constexpr int spriteWidth = 137;
-constexpr int spriteHeigth = 105;
-constexpr int spriteTop = 0;
-constexpr int maxSpriteLeftLive = 411;
-constexpr int maxSpriteLeftDead = 1096;
-constexpr int minPlayerHelth = 20;
+const float ANIMATION_TIME = 0.1f;
+constexpr int SPRITE_WIDTH = 137;
+constexpr int SPRITE_HEIGTH = 105;
+constexpr int SPRITE_TOP = 0;
+constexpr int MAX_SPRITE_LEFT_LIVE = 411;
+constexpr int MAX_SPRITE_LEFT_DEAD = 1096;
+constexpr int MIN_PLAYER_HELTH = 20;
+constexpr unsigned HIT_INTERVAL_TIME = 100;
 
 sf::Vector2f toEuclidean(float radius, float angle)
 {
@@ -23,31 +23,37 @@ void animatePlayer(float elapsedTime, Player &player, sf::Clock &animationClock)
 {
     if (player.isMoving && !player.isAnimationStopped)
     {
-        if (animationClock.getElapsedTime().asSeconds() > animationTime)
+        if (animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
         {
-            if (player.spriteLeft == maxSpriteLeftLive)
-                player.spriteLeft = spriteWidth;
+            if (player.spriteLeft == MAX_SPRITE_LEFT_LIVE)
+                player.spriteLeft = SPRITE_WIDTH;
             else
-                player.spriteLeft += spriteWidth;
+                player.spriteLeft += SPRITE_WIDTH;
 
-            player.player.setTextureRect(sf::IntRect(player.spriteLeft, spriteTop, spriteWidth, spriteHeigth));
+            player.player.setTextureRect(sf::IntRect(player.spriteLeft, SPRITE_TOP,
+                                                     SPRITE_WIDTH, SPRITE_HEIGTH));
             animationClock.restart();
         }
     }
-    if (player.helth <= minPlayerHelth)
+    if (player.helth <= MIN_PLAYER_HELTH)
     {
-        if (animationClock.getElapsedTime().asSeconds() > animationTime)
+        if (animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
         {
-            if (player.spriteLeft == maxSpriteLeftDead)
+            if (player.spriteLeft == MAX_SPRITE_LEFT_DEAD)
                 player.isAnimationStopped = true;
             else
-                player.spriteLeft += spriteWidth;
-            player.player.setTextureRect(sf::IntRect(player.spriteLeft, spriteTop, spriteWidth, spriteHeigth));
+                player.spriteLeft += SPRITE_WIDTH;
+            player.player.setTextureRect(sf::IntRect(player.spriteLeft, SPRITE_TOP,
+                                                     SPRITE_WIDTH, SPRITE_HEIGTH));
             animationClock.restart();
         }
     }
     if (player.isAnimationStopped)
-        player.player.setTextureRect(sf::IntRect(maxSpriteLeftDead - spriteWidth, spriteTop, spriteWidth, spriteHeigth));
+    {
+        player.player.setTextureRect(sf::IntRect(MAX_SPRITE_LEFT_DEAD - SPRITE_WIDTH, SPRITE_TOP,
+                                                 SPRITE_WIDTH, SPRITE_HEIGTH));
+        player.isLive = false;
+    }
 }
 
 void movePlayer(Player &player, float elapsedTime)
@@ -94,36 +100,22 @@ void updatePlayer(Player &player, const sf::Vector2f &mousePosition)
     player.player.setRotation(atan2(delta.y, delta.x) * 180 / M_PI);
 }
 
-void updateAim(Player &player, Aim &aim)
-{
-    sf::Vector2f aimOffset = toEuclidean(AIM_DISTANCE, player.player.getRotation() * M_PI / 180.0f);
-    aim.position = player.position + aimOffset;
-    aim.aim.setPosition(aim.position);
-}
-
 void initPlayer(Player &player)
 {
     player.spriteLeft = 0;
     player.playerTexture.loadFromFile("img/player.png");
     player.playerTexture.setSmooth(true);
     player.player.setTexture(player.playerTexture);
-    sf::IntRect playerSource(player.spriteLeft, spriteTop, spriteWidth, spriteHeigth);
+    sf::IntRect playerSource(player.spriteLeft, SPRITE_TOP, SPRITE_WIDTH, SPRITE_HEIGTH);
     player.player.setTextureRect(playerSource);
-    player.player.setOrigin(player.player.getLocalBounds().width / 2, player.player.getLocalBounds().height / 2);
+    player.player.setOrigin(player.player.getLocalBounds().width / 2,
+                            player.player.getLocalBounds().height / 2);
     player.player.setPosition(HERO_INITIAL_POSITION);
     player.player.setScale(0.5, 0.5);
-    player.helth = 200;
+    player.helth = 265;
     player.isMoving = false;
     player.isAnimationStopped = false;
-}
-
-void initAim(Aim &aim)
-{
-    aim.aimTexture.loadFromFile("img/crosshair1.png");
-    aim.aimTexture.setSmooth(true);
-    aim.aim.setTexture(aim.aimTexture);
-    aim.aim.setOrigin(aim.aim.getLocalBounds().width / 2, aim.aim.getLocalBounds().height / 2);
-    aim.aim.setScale(0.5, 0.5);
+    player.isLive = true;
 }
 
 bool handlePlayerKeyPress(const sf::Event::KeyEvent &event, Player &player)
@@ -185,4 +177,30 @@ bool handlePlayerKeyRelease(const sf::Event::KeyEvent &event, Player &player)
     }
 
     return handled;
+}
+
+bool isLive(Player &player)
+{
+    return player.isLive;
+}
+
+bool hit(sf::Clock &hitClock, Player &player)
+{
+    static sf::Time accumulatedTime;
+    accumulatedTime += hitClock.restart();
+    const sf::Time hitInterval = sf::milliseconds(HIT_INTERVAL_TIME);
+    if (accumulatedTime >= hitInterval && player.helth > 0)
+    {
+        player.lastHit = hitClock.getElapsedTime();
+        accumulatedTime = sf::Time::Zero;
+        player.helth -= 1;
+        if (player.helth < 0)
+            player.helth = 0;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

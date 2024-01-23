@@ -11,7 +11,8 @@ set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
 set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
 
 # Добавление исполняемого файла
-add_executable(game main.cpp player.cpp bullet.cpp enemy.cpp map.cpp)
+add_executable(game main.cpp gamescene.cpp player.cpp bullet.cpp enemy.cpp 
+map.cpp helth.cpp camera.cpp aim.cpp text.cpp menu.cpp)
 
 find_package(Freetype)
 find_package(JPEG)

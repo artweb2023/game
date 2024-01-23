@@ -29,7 +29,7 @@ sf::String tileMap[HEIGHT_MAP] = {
     "0000000000000000000000000000000000000000",
 };
 
-void initializeMap(Map &map)
+void initMap(Map &map)
 {
     map.mapImage.loadFromFile(TEXTURE_PATH);
     map.map.loadFromImage(map.mapImage);
@@ -73,8 +73,8 @@ void drawMap(sf::RenderWindow &window, const Map &map)
 
 bool checkMapWallsCollision(const sf::Vector2f &position)
 {
-    int columnIndex = static_cast<int>(position.x / 130);
-    int rowIndex = static_cast<int>(position.y / 130);
+    int columnIndex = static_cast<int>(position.x / BLOCK_SIZE);
+    int rowIndex = static_cast<int>(position.y / BLOCK_SIZE);
     if (rowIndex >= 0 && rowIndex < HEIGHT_MAP && columnIndex >= 0 && columnIndex < WIDTH_MAP)
     {
         return tileMap[rowIndex][columnIndex] == '0';
