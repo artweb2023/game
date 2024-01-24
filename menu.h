@@ -10,12 +10,12 @@ struct Menu
     sf::RectangleShape rectangle;
     std::vector<sf::RectangleShape> buttonRectangles;
     Text playText;
-    Text levelText;
+    Text helpText;
     Text exitText;
 };
 
-void initButton(float centerX, float centerY, Menu &menu);
 void initMenu(Menu &menu);
+void updateMenuPostion(Menu &menu, sf::Vector2f postion);
 void moveUp(Menu &menu);
 void moveDown(Menu &menu);
 void drawMenu(sf::RenderWindow &window, Menu &menu);

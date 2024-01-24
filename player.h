@@ -21,6 +21,7 @@ struct Player
     sf::Vector2f position;
     sf::IntRect sourceRect;
     sf::Time lastHit;
+    sf::Clock animationClock;
     Direction direction;
     int spriteLeft;
     int helth;
@@ -30,9 +31,8 @@ struct Player
 };
 
 void movePlayer(Player &player, float elapsedTime);
-void updatePlayer(Player &player, const sf::Vector2f &mousePosition);
+void updatePlayer(float elapsedTime, Player &player, const sf::Vector2f &mousePosition);
 void initPlayer(Player &player);
-void animatePlayer(float elapsedTime, Player &player, sf::Clock &animationClock);
 bool handlePlayerKeyPress(const sf::Event::KeyEvent &event, Player &player);
 bool handlePlayerKeyRelease(const sf::Event::KeyEvent &event, Player &player);
 bool hit(sf::Clock &hitClock, Player &player);

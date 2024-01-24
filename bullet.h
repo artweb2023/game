@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "map.h"
+#include "camera.h"
 
 struct Bullet
 {
@@ -20,5 +21,5 @@ void shoot(Bullet &bullet, float startX, float startY, float targetX, float targ
 void stop(Bullet &bullet);
 bool isInFlight(Bullet &bullet);
 sf::FloatRect getPosition(Bullet &bullet);
-sf::Sprite getSprite(const Bullet &bullet);
-void updateBullet(Bullet &bullet, float elapsedTime);
+void updateBullet(Bullet &bullet, float elapsedTime, Camera &camera,
+                  const float WINDOW_WIDTH, const float WINDOW_HEIGHT);

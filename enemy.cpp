@@ -50,7 +50,7 @@ bool isAlive(const Enemy &enemy)
     return enemy.isLive;
 }
 
-bool isVisible(Enemy &enemy)
+bool isVisible(const Enemy &enemy)
 {
     return enemy.isVisible;
 }
@@ -60,11 +60,11 @@ void getVisible(Enemy &enemy)
     enemy.isLive ? enemy.isVisible = true : enemy.isVisible = false;
 }
 
-void animateEnemy(float elapsedTime, Enemy &enemy, sf::Clock &animationClock)
+void animateEnemy(float elapsedTime, Enemy &enemy)
 {
     if (enemy.isLive)
     {
-        if (animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
+        if (enemy.animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
         {
             if (enemy.spriteLeft == MAX_SPRITE_LEFT_LIVE)
                 enemy.spriteLeft = 0;
@@ -72,49 +72,53 @@ void animateEnemy(float elapsedTime, Enemy &enemy, sf::Clock &animationClock)
                 enemy.spriteLeft += SPRITE_WIDTH;
 
             enemy.enemy.setTextureRect(sf::IntRect(enemy.spriteLeft, SPRITE_TOP, SPRITE_WIDTH, SPRITE_HEIGTH));
-            animationClock.restart();
+            enemy.animationClock.restart();
         }
     }
     else
     {
-        if (animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
+        if (enemy.animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
         {
             if (enemy.spriteLeft == MAX_SPRITE_LEFT_LIVE)
                 enemy.spriteLeft = MAX_SPRITE_LEFT_LIVE;
             else
                 enemy.spriteLeft += SPRITE_WIDTH;
             enemy.enemy.setTextureRect(sf::IntRect(enemy.spriteLeft, SPRITE_TOP_DETH, SPRITE_WIDTH, SPRITE_HEIGTH));
-            animationClock.restart();
+            enemy.animationClock.restart();
         }
     }
 }
 
-bool hitEnemy(sf::Clock &hitClock, Enemy &enemy)
+bool hitEnemy(sf::Clock &hitClock, Enemy &enemy, Bullet &bullet)
 {
     static sf::Time accumulatedTime;
     accumulatedTime += hitClock.restart();
     const sf::Time hitInterval = sf::milliseconds(HIT_INTERVAL_TIME);
-    if (accumulatedTime >= hitInterval && enemy.helth > 0)
+    if (accumulatedTime >= hitInterval && enemy.helth > 0 && enemy.isLive)
     {
-        enemy.lastHit = hitClock.getElapsedTime();
-        accumulatedTime = sf::Time::Zero;
-        enemy.helth -= 1;
-        if (enemy.helth < 0)
-            enemy.helth = 0;
+        if (enemy.enemy.getGlobalBounds().contains(bullet.position))
+        {
+            enemy.lastHit = hitClock.getElapsedTime();
+            accumulatedTime = sf::Time::Zero;
+            enemy.helth -= 2;
+            if (enemy.helth <= 0)
+            {
+                enemy.helth = 0;
+                enemy.isLive = false;
+            }
 
-        return true;
+            return true;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
-void updateEnemy(float deltaTime, Enemy &enemy, Player &player, sf::Clock &animationClock)
+void updateEnemy(float deltaTime, Enemy &enemy, Player &player)
 {
     if (enemy.isLive && enemy.isVisible)
     {
-        enemy.speed = 150.f;
+        enemy.speed = 50.f;
         sf::Vector2f direction = player.position - enemy.position;
         float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
         if (length != 0)
@@ -128,7 +132,7 @@ void updateEnemy(float deltaTime, Enemy &enemy, Player &player, sf::Clock &anima
             enemy.enemy.setRotation(angle);
         }
     }
-    animateEnemy(deltaTime, enemy, animationClock);
+    animateEnemy(deltaTime, enemy);
 }
 
 bool checkEnemyCollision(const Enemy &enemy1, const Enemy &enemy2)
@@ -138,9 +142,20 @@ bool checkEnemyCollision(const Enemy &enemy1, const Enemy &enemy2)
     return rect1.intersects(rect2) && rect1.width - MIN_COLLISION_OVERLAP > 0 && rect1.height - MIN_COLLISION_OVERLAP > 0;
 }
 
+sf::Sprite getSprite(Enemy &enemy)
+{
+    return enemy.enemy;
+}
+
+sf::Sprite getSprite(const Enemy &enemy)
+{
+    return enemy.enemy;
+}
+
 void drawEnemy(sf::RenderWindow &window, const Enemy &enemy)
 {
-    window.draw(enemy.enemy);
+    if (isVisible(enemy))
+        window.draw(getSprite(enemy));
 }
 
 void drawEnemies(sf::RenderWindow &window, const std::vector<std::unique_ptr<Enemy>> &enemies)

@@ -6,6 +6,7 @@
 #include <array>
 #include "player.h"
 #include "map.h"
+#include "bullet.h"
 
 struct Enemy
 {
@@ -15,6 +16,7 @@ struct Enemy
     sf::IntRect enemyRect;
     sf::Clock lastHitTime;
     sf::Time lastHit;
+    sf::Clock animationClock;
     int spriteLeft;
     int helth;
     bool isLive;
@@ -25,11 +27,10 @@ struct Enemy
 void initEnemy(Enemy &enemy);
 void spawn(Enemy &enemy);
 bool isAlive(const Enemy &enemy);
-bool isVisible(Enemy &enemy);
+bool isVisible(const Enemy &enemy);
 void getVisible(Enemy &enemy);
-void animateEnemy(float elapsedTime, Enemy &enemy, sf::Clock &animationClock);
-bool hitEnemy(sf::Clock &hitClock, Enemy &enemy);
-void updateEnemy(float deltaTime, Enemy &enemy, Player &player, sf::Clock &animationClock);
+bool hitEnemy(sf::Clock &hitClock, Enemy &enemy, Bullet &bullet);
+void updateEnemy(float deltaTime, Enemy &enemy, Player &player);
 bool checkEnemyCollision(const Enemy &enemy1, const Enemy &enemy2);
-void drawEnemy(sf::RenderWindow &window, const Enemy &enemy);
 void drawEnemies(sf::RenderWindow &window, const std::vector<std::unique_ptr<Enemy>> &enemies);
+sf::Sprite getSprite(Enemy &enemy);

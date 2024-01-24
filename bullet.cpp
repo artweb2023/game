@@ -1,7 +1,6 @@
 #include "bullet.h"
 #include <cmath>
 
-constexpr int BULLET_RADIUS = 5;
 constexpr int BULLET_SPEED = 1000;
 constexpr float RANGE = 1000;
 
@@ -53,21 +52,23 @@ sf::FloatRect getPosition(Bullet &bullet)
     return bullet.bullet.getGlobalBounds();
 }
 
-sf::Sprite getSprite(const Bullet &bullet)
-{
-    return bullet.bullet;
-}
-
-void updateBullet(Bullet &bullet, float elapsedTime)
+void updateBullet(Bullet &bullet, float elapsedTime, Camera &camera,
+                  const float WINDOW_WIDTH, const float WINDOW_HEIGHT)
 {
     if (bullet.isFlight)
     {
         bullet.position.x += bullet.bulletDistance.x * elapsedTime;
         bullet.position.y += bullet.bulletDistance.y * elapsedTime;
         bullet.bullet.setPosition(bullet.position);
-        if (bullet.position.x < bullet.min.x || bullet.position.x > bullet.max.x ||
-            bullet.position.y < bullet.min.y || bullet.position.y > bullet.max.y ||
+
+        // Проверяем, находится ли пуля в пределах камеры
+        if (bullet.position.x < camera.camera.getCenter().x - WINDOW_WIDTH / 2 ||
+            bullet.position.x > camera.camera.getCenter().x + WINDOW_WIDTH / 2 ||
+            bullet.position.y < camera.camera.getCenter().y - WINDOW_HEIGHT / 2 ||
+            bullet.position.y > camera.camera.getCenter().y + WINDOW_HEIGHT / 2 ||
             checkMapWallsCollision(bullet.position))
+        {
             bullet.isFlight = false;
+        }
     }
 }

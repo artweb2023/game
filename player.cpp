@@ -19,11 +19,11 @@ sf::Vector2f toEuclidean(float radius, float angle)
     return sf::Vector2f(x, y);
 }
 
-void animatePlayer(float elapsedTime, Player &player, sf::Clock &animationClock)
+void animatePlayer(float elapsedTime, Player &player)
 {
     if (player.isMoving && !player.isAnimationStopped)
     {
-        if (animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
+        if (player.animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
         {
             if (player.spriteLeft == MAX_SPRITE_LEFT_LIVE)
                 player.spriteLeft = SPRITE_WIDTH;
@@ -32,12 +32,12 @@ void animatePlayer(float elapsedTime, Player &player, sf::Clock &animationClock)
 
             player.player.setTextureRect(sf::IntRect(player.spriteLeft, SPRITE_TOP,
                                                      SPRITE_WIDTH, SPRITE_HEIGTH));
-            animationClock.restart();
+            player.animationClock.restart();
         }
     }
     if (player.helth <= MIN_PLAYER_HELTH)
     {
-        if (animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
+        if (player.animationClock.getElapsedTime().asSeconds() > ANIMATION_TIME)
         {
             if (player.spriteLeft == MAX_SPRITE_LEFT_DEAD)
                 player.isAnimationStopped = true;
@@ -45,7 +45,7 @@ void animatePlayer(float elapsedTime, Player &player, sf::Clock &animationClock)
                 player.spriteLeft += SPRITE_WIDTH;
             player.player.setTextureRect(sf::IntRect(player.spriteLeft, SPRITE_TOP,
                                                      SPRITE_WIDTH, SPRITE_HEIGTH));
-            animationClock.restart();
+            player.animationClock.restart();
         }
     }
     if (player.isAnimationStopped)
@@ -93,11 +93,12 @@ void movePlayer(Player &player, float elapsedTime)
     }
 }
 
-void updatePlayer(Player &player, const sf::Vector2f &mousePosition)
+void updatePlayer(float elapsedTime, Player &player, const sf::Vector2f &mousePosition)
 {
     player.position = player.player.getPosition();
     const sf::Vector2f delta = mousePosition - player.position;
     player.player.setRotation(atan2(delta.y, delta.x) * 180 / M_PI);
+    animatePlayer(elapsedTime, player);
 }
 
 void initPlayer(Player &player)

@@ -16,15 +16,24 @@ void handleEvents(sf::RenderWindow &window, GameScene &scene)
     {
         if (event.type == sf::Event::Closed)
             window.close();
+        else if (event.type == sf::Event::MouseMoved)
+        {
+            onMouseMove(event.mouseMove, scene.mousePosition, scene.camera, window);
+        }
+        else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
+        {
+            shoot(scene.bullet, scene.player.player.getPosition().x,
+                  scene.player.player.getPosition().y, scene.mousePosition.x, scene.mousePosition.y);
+        }
         handleEventsGameScene(window, event, scene);
     }
 }
 
-void update(sf::Clock &clock, sf::Clock &animationClockPlayer, sf::Clock &animationClockEnemy,
-            sf::Clock &hitTime, sf::View &view, sf::Vector2f &mousePosition, GameScene &scene)
+void update(sf::Clock &clock, sf::Clock &hitTimeEnemy, sf::Clock hitTimePlayer, sf::View &view,
+            sf::Vector2f &mousePosition, GameScene &scene)
 {
     const float elapsedTime = clock.getElapsedTime().asSeconds();
-    updateGameScene(elapsedTime, animationClockPlayer, animationClockEnemy, hitTime, mousePosition, scene);
+    updateGameScene(elapsedTime, hitTimeEnemy, hitTimePlayer, mousePosition, scene);
     clock.restart();
 }
 
@@ -42,13 +51,12 @@ int main(int, char *[])
     GameScene scene;
     initializeGameScene(scene);
     sf::Clock clock;
-    sf::Clock animationClockPlayer;
-    sf::Clock animationClockEnemy;
-    sf::Clock hitTime;
+    sf::Clock hitTimeEnemy;
+    sf::Clock hitTimePlayer;
     while (window.isOpen())
     {
         handleEvents(window, scene);
-        update(clock, animationClockPlayer, animationClockEnemy, hitTime, scene.camera.camera,
+        update(clock, hitTimeEnemy, hitTimePlayer, scene.camera.camera,
                scene.mousePosition, scene);
         render(window, scene);
     }

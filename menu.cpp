@@ -41,16 +41,16 @@ void initMenu(Menu &menu)
     menu.rectangle.setFillColor(COLOR);
     menu.rectangle.setOutlineColor(sf::Color(255, 255, 255));
     menu.rectangle.setOutlineThickness(1.0f);
-    menu.mainMenuSelected = 3;
+    menu.mainMenuSelected = 0;
     initButton(centerX, centerY, menu);
     showText("Play", 50, sf::Vector2f(350, 198), sf::Color::White, menu.playText);
-    showText("Level", 50, sf::Vector2f(350, 268), sf::Color::White, menu.levelText);
+    showText("Help", 50, sf::Vector2f(350, 268), sf::Color::White, menu.helpText);
     showText("Exit", 50, sf::Vector2f(350, 338), sf::Color::White, menu.exitText);
 }
 
 void moveUp(Menu &menu)
 {
-    if (menu.mainMenuSelected > 0 && menu.mainMenuSelected <= 3)
+    if (menu.mainMenuSelected > 0 && menu.mainMenuSelected <= menu.buttonRectangles.size())
     {
         menu.buttonRectangles[menu.mainMenuSelected].setFillColor(LIGHT_GRAY);
         menu.mainMenuSelected--;
@@ -68,6 +68,25 @@ void moveDown(Menu &menu)
     }
 }
 
+void updateMenuPostion(Menu &menu, sf::Vector2f position)
+{
+    menu.menu.setPosition(position);
+    float centerX = (position.x + 278);
+    float centerY = (position.y + 155);
+    menu.rectangle.setPosition(centerX, centerY);
+    float buttonX = (centerX - BUTTON_WIDTH / 2.0f) + 123.5f;
+    float buttonY = (centerY - (NUM_BUTTONS * BUTTON_HEIGHT + (NUM_BUTTONS - 1) * BUTTON_SPACING) / 2.0f) + 148.f;
+    for (int i = 0; i < NUM_BUTTONS; ++i)
+    {
+        sf::RectangleShape &buttonRect = menu.buttonRectangles[i];
+        buttonRect.setPosition(buttonX, buttonY);
+        buttonY += BUTTON_HEIGHT + BUTTON_SPACING;
+    }
+    menu.playText.text.setPosition(centerX + 75, centerY + 46);
+    menu.helpText.text.setPosition(centerX + 75, centerY + 116);
+    menu.exitText.text.setPosition(centerX + 75, centerY + 186);
+}
+
 void drawMenu(sf::RenderWindow &window, Menu &menu)
 {
     window.draw(menu.menu);
@@ -79,6 +98,6 @@ void drawMenu(sf::RenderWindow &window, Menu &menu)
     }
 
     window.draw(menu.playText.text);
-    window.draw(menu.levelText.text);
+    window.draw(menu.helpText.text);
     window.draw(menu.exitText.text);
 }
