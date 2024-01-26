@@ -24,6 +24,7 @@ void handleEvents(sf::RenderWindow &window, GameScene &scene)
         {
             shoot(scene.bullet, scene.player.player.getPosition().x,
                   scene.player.player.getPosition().y, scene.mousePosition.x, scene.mousePosition.y);
+            playShotSound(scene.sound);
         }
         handleEventsGameScene(window, event, scene);
     }

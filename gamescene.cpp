@@ -25,6 +25,7 @@ void initializeGameScene(GameScene &scene)
     initBullet(scene.bullet);
     initHelth(scene.helth);
     creatingEnemies(scene, NUM_ENEMIES);
+    createSound(scene.sound);
     scene.playerScore = 0;
     scene.imageGameOver.loadFromFile("img/game_over.jpg");
     scene.imageGameOverBackground.loadFromImage(scene.imageGameOver);
@@ -57,6 +58,7 @@ void getDamagePlayer(sf::Clock &hitClock, GameScene &scene)
         {
             if (hit(hitClock, scene.player))
             {
+                playPlayerDamageSound(scene.sound);
                 hitClock.restart();
             }
         }
@@ -78,6 +80,7 @@ void getDamageEnemy(sf::Clock &hitClock, GameScene &scene)
                 enemyPtr->isLive = false;
                 scene.playerScore += 1;
                 hitClock.restart();
+                playHitSound(scene.sound);
             }
         }
     }
@@ -109,6 +112,7 @@ void updateGameScene(float elapsedTime, sf::Clock &hitTimeEnemy, sf::Clock &hitT
             scene.bullet.isFlight = false;
             scene.gameState = GameState::PlayerWin;
         }
+        playGameMusic(scene.sound);
     }
 }
 
@@ -211,6 +215,7 @@ void drawGameScreen(sf::RenderWindow &window, GameScene &scene)
         textPosition = sf::Vector2f(cameraPosition.x - 60, cameraPosition.y - 150);
         showText(gameWinText, 50, textPosition, sf::Color::White, scene.text);
     }
+    stop(scene.sound);
     updateMenuPostion(scene.menu, scene.gameScreenPosition);
     gameStateSprite.setPosition(scene.gameScreenPosition);
     window.draw(gameStateSprite);
@@ -238,6 +243,7 @@ void drawGameScene(sf::RenderWindow &window, GameScene &scene)
     if (scene.gameState == GameState::PlayerLosed || scene.gameState == GameState::PlayerWin)
     {
         drawGameScreen(window, scene);
+        allStop(scene.sound);
     }
 }
 

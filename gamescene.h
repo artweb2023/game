@@ -9,6 +9,7 @@
 #include "aim.h"
 #include "text.h"
 #include "menu.h"
+#include "sound.h"
 #include <iostream>
 #include <sstream>
 
@@ -39,6 +40,7 @@ struct GameScene
     Enemy enemy;
     Text text;
     Menu menu;
+    Sound sound;
     std::vector<std::unique_ptr<Enemy>> enemies;
     GameState gameState;
     sf::Vector2f mousePosition;

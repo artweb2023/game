@@ -106,7 +106,6 @@ bool hitEnemy(sf::Clock &hitClock, Enemy &enemy, Bullet &bullet)
                 enemy.helth = 0;
                 enemy.isLive = false;
             }
-
             return true;
         }
     }

@@ -12,7 +12,7 @@ set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
 
 # Добавление исполняемого файла
 add_executable(game main.cpp gamescene.cpp player.cpp bullet.cpp enemy.cpp 
-map.cpp helth.cpp camera.cpp aim.cpp text.cpp menu.cpp)
+map.cpp helth.cpp camera.cpp aim.cpp text.cpp menu.cpp sound.cpp)
 
 find_package(Freetype)
 find_package(JPEG)
@@ -28,4 +28,4 @@ set_target_properties(game PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-target_link_libraries(game PRIVATE sfml-graphics)
+target_link_libraries(game PRIVATE sfml-graphics sfml-audio)
